@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Show-Me Guide for Developers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: template switcher on top, then one column of demo cards; each card = plain problem, numbered steps with buttons, "you should see", ask */
+:root {
+  --bg: #f4f6fb; --surface: #ffffff; --fg: #141a2a; --muted: #5d667a; --line: #dfe3ec;
+  --accent: #3b4fd8; --accent-soft: #e9ecfd; --bad: #c2410c; --bad-soft: #fdeee6; --good: #1f7a4d; --good-soft: #e5f5ec; --kbd: #eef1f7;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10131c; --surface: #181d29; --fg: #e6e9f2; --muted: #9ba3b6; --line: #2a3142;
+  --accent: #8d9cff; --accent-soft: #232a4a; --bad: #ff9a6c; --bad-soft: #3a2219; --good: #6fd29c; --good-soft: #17301f; --kbd: #252c3b; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10131c; --surface: #181d29; --fg: #e6e9f2; --muted: #9ba3b6; --line: #2a3142;
+  --accent: #8d9cff; --accent-soft: #232a4a; --bad: #ff9a6c; --bad-soft: #3a2219; --good: #6fd29c; --good-soft: #17301f; --kbd: #252c3b; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); }
+.wrap { max-width: 880px; margin: 0 auto; padding-block: 36px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 24px; }
+h1 { font: 700 30px/1.15 var(--display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h2 { font: 600 19px/1.3 var(--display); margin: 0; text-wrap: balance; }
+p { margin: 0; } .muted { color: var(--muted); }
+.lede { color: var(--muted); max-width: 64ch; }
+kbd { font: 500 12.5px var(--mono); background: var(--kbd); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 6px; white-space: nowrap; }
+code { font: 13px var(--mono); background: var(--kbd); padding: 1px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pane { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 8px; min-width: 0; }
+.pane h3 { margin: 0; font: 600 14px var(--display); }
+.mock { border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: grid; gap: 6px; font-size: 12.5px; }
+.bar { height: 9px; border-radius: 3px; background: var(--line); }
+.bar.h { height: 14px; width: 70%; background: var(--fg); opacity: .8; }
+.bar.s { width: 90%; } .bar.t { width: 60%; }
+.skel { height: 9px; border-radius: 3px; background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 12px); }
+.tag { font: 600 11px var(--body); letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; justify-self: start; }
+.tag.good { background: var(--good-soft); color: var(--good); } .tag.bad { background: var(--bad-soft); color: var(--bad); }
+
+.tips { background: var(--accent-soft); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; font-size: 14px; }
+.tips ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+
+.switch { display: flex; flex-wrap: wrap; gap: 8px; }
+.switch button { font: 500 14px var(--body); border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 8px 14px; border-radius: 99px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.switch button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.switch .count { font-size: 12px; opacity: .8; font-variant-numeric: tabular-nums; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.progress { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+.meter { flex: 1 1 180px; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--good); width: 0; transition: width .3s; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 14px; min-width: 0; }
+.card.done { border-color: var(--good); }
+.top { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.top h2 { flex: 1 1 380px; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font: 600 11.5px var(--body); padding: 2px 9px; border-radius: 99px; background: var(--kbd); color: var(--muted); }
+.badge.p1 { background: var(--bad-soft); color: var(--bad); }
+.plain { font-size: 15px; }
+.steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; counter-increment: s; }
+.steps li::before { content: counter(s); width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font: 600 13px var(--display); display: grid; place-items: center; margin-top: 1px; }
+.steps li > div { min-width: 0; display: grid; gap: 6px; }
+.act { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { font: 500 13.5px var(--body); text-decoration: none; border: 1px solid var(--accent); color: var(--accent); background: transparent; padding: 5px 12px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn.solid { background: var(--accent); color: var(--surface); }
+.find { display: inline-flex; align-items: center; gap: 6px; font: 13px var(--mono); background: var(--kbd); border: 1px dashed var(--line); padding: 3px 4px 3px 8px; border-radius: 6px; max-width: 100%; }
+.find span { overflow-wrap: anywhere; }
+.find button { font: 500 12px var(--body); border: 0; background: var(--surface); color: var(--accent); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+.see { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.see > div { border-radius: 8px; padding: 10px 12px; font-size: 14px; display: grid; gap: 4px; min-width: 0; }
+.see .now { background: var(--bad-soft); } .see .should { background: var(--good-soft); }
+.see b { font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .05em; }
+.see .now b { color: var(--bad); } .see .should b { color: var(--good); }
+.ask { border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; font-size: 14.5px; }
+.foot { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 12px; }
+.check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--good); }
+.toast { font-size: 13px; color: var(--good); }
+.tech { border: 1px solid var(--accent); border-radius: 8px; padding: 10px 12px; background: var(--surface); min-width: 0; }
+.tech > summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--accent); }
+.tech[open] > summary { margin-bottom: 10px; }
+.td { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 10px 16px; font-size: 14px; }
+.td dt { font: 600 11.5px var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding-top: 2px; }
+.td dd { margin: 0; min-width: 0; }
+.td dd ol, .td dd ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.td pre { margin: 6px 0 0; font: 12.5px/1.5 var(--mono); background: var(--kbd); padding: 10px 12px; border-radius: 6px; overflow-x: auto; white-space: pre; }
+.rec { margin: 12px 0 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.rec img { display: block; width: 100%; height: auto; max-width: 100%; background: var(--kbd); }
+.rec figcaption { padding: 8px 10px; font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) { .td { grid-template-columns: 1fr; gap: 2px; } .td dd { margin-bottom: 8px; } }
+.conf { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.conf summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.cfwrap { overflow-x: auto; margin-top: 8px; }
+.cft { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 13px; }
+.cft th, .cft td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.cft th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.cft tr.cur td { background: var(--accent-soft); }
+.cft td a { color: var(--accent); overflow-wrap: anywhere; }
+.cf { font: 600 12px var(--body); white-space: nowrap; color: var(--muted); }
+.cf.ok { color: var(--good); } .cf.no { color: var(--muted); opacity: .7; }
+@media (max-width: 640px) { .two, .see { grid-template-columns: 1fr; } h1 { font-size: 25px; } }
+@media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:10px">
+    <div class="muted" style="font:600 12px var(--body);letter-spacing:.08em;text-transform:uppercase">thinksys.com · for the marketing → dev handover</div>
+    <h1>Show each issue to your developers in 30 seconds</h1>
+    <p class="lede">Pick a page type. Every card is a short live demo you can do on screen in Chrome, with no tools to install: open the page, follow the steps, point at the result, and read out the one-line ask. Developers open <b>Technical detail</b> on each card for the evidence, the fix with code and a screen recording.</p>
+  </header>
+
+  <section style="display:grid;gap:10px">
+    <h2>The one idea behind most of these issues</h2>
+    <p class="muted">Every page exists in two versions. Developers fix the second one.</p>
+    <div class="two">
+      <div class="pane"><h3>What a visitor sees</h3><p class="muted" style="font-size:13px">After the browser runs the site's JavaScript.</p>
+        <div class="mock"><div class="bar h"></div><div class="bar s"></div><div class="bar"></div><div class="bar t"></div><div class="bar s"></div></div>
+        <span class="tag good">Full article</span></div>
+      <div class="pane"><h3>What Google, Bing, LinkedIn and AI tools read first</h3><p class="muted" style="font-size:13px">The raw page from the server. You can see it with <kbd>Ctrl</kbd>+<kbd>U</kbd>.</p>
+        <div class="mock"><div class="skel"></div><div class="skel" style="width:80%"></div><div style="font:12px var(--mono);color:var(--muted)">"Loading blog details…"</div><div class="skel" style="width:60%"></div></div>
+        <span class="tag bad">Empty placeholder (blog posts)</span></div>
+    </div>
+  </section>
+
+  <div class="tips">
+    <b>Before the meeting</b>
+    <ul>
+      <li>Use <b>Chrome</b>. For the cookie and analytics demos, open an <b>Incognito window</b> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd>) so the cookie banner shows again.</li>
+      <li><b>View the raw page:</b> <kbd>Ctrl</kbd>+<kbd>U</kbd> (Mac <kbd>⌥</kbd><kbd>⌘</kbd><kbd>U</kbd>). <b>Search in it:</b> <kbd>Ctrl</kbd>+<kbd>F</kbd> (Mac <kbd>⌘</kbd><kbd>F</kbd>).</li>
+      <li><b>Developer tools:</b> <kbd>F12</kbd> (Mac <kbd>⌥</kbd><kbd>⌘</kbd><kbd>I</kbd>). You'll use the <b>Console</b>, <b>Network</b> and <b>Application</b> tabs.</li>
+      <li>Use the copy buttons next to the grey search boxes, then paste into Chrome's search bar.</li>
+    </ul>
+  </div>
+
+  <section style="display:grid;gap:12px">
+    <h2>Which page type are you showing?</h2>
+    <div class="switch" id="switch" role="group" aria-label="Page type"></div>
+    <div class="progress"><span id="progText"></span><div class="meter" aria-hidden="true"><i id="progBar"></i></div></div>
+  </section>
+
+  <section id="cards" style="display:grid;gap:16px" aria-live="polite"></section>
+
+  <p class="muted" style="font-size:13.5px">Each card has a <b>Technical detail for developers</b> section with evidence, the fix with code, and a "done when" test. Ticks you make here are saved only in your own browser. Site: Next.js 16.4.3 frontend with Strapi CMS.</p>
+</div>
+
+<!-- Technical detail per issue (cloned into each card) -->
+<template id="tech-1">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>The blog detail component doesn't render on the server. React marks its Suspense boundary as client-rendered (<code>&lt;!--$!--&gt;</code> with an empty <code>data-dgst</code>) and sends the fallback: a "Loading blog details" skeleton. The H1 and paragraphs exist only as JSON inside <code>self.__next_f.push(...)</code> and are built in the browser. Affects all 457 live posts in <code>blog</code> and <code>old_post</code>.</dd>
+    <dt>Evidence</dt><dd>Raw HTML of <code>/development/mobile-choices/</code>:
+<pre>&lt;div hidden id="S:0"&gt;&lt;!--$!--&gt;&lt;template data-dgst=""&gt;&lt;/template&gt;
+  &lt;div role="status" aria-label="Loading blog details"&gt;
+    &lt;section class="GJox0a_blueHero" aria-hidden="true"&gt; ...skeleton bars...</pre>
+      The H1 only exists inside the RSC payload: <code>["$","h1",null,{...,"children":["$","span",null,{"children":"The Mobile Choices You Have To Make"}]}]</code></dd>
+    <dt>Reproduce</dt><dd><pre>curl -s https://thinksys.com/development/mobile-choices/ | grep -c "&lt;h1"                  # 0
+curl -s https://thinksys.com/development/mobile-choices/ | grep -c "Loading blog details"   # 2</pre>
+      Locally: <code>next build &amp;&amp; next start</code>, request a post and watch the terminal; production hides the SSR error, the server log shows it.</dd>
+    <dt>Likely cause</dt><dd>Something in the blog detail tree throws during SSR (<code>window</code>/<code>document</code>/<code>localStorage</code> in render, or the Strapi fetch failing at render time), or the article is loaded with <code>dynamic(..., { ssr: false })</code>, or a client component calls <code>useSearchParams()</code> without its own Suspense boundary.</dd>
+    <dt>Fix</dt><dd><ol>
+      <li>Search the blog detail tree for <code>"use client"</code> on the body component, <code>dynamic(..., { ssr: false })</code>, <code>useSearchParams()</code> and browser-only APIs used during render.</li>
+      <li>Make the route a Server Component that fetches and renders the article:
+<pre>// app/[category]/[slug]/page.tsx  (no "use client")
+import { notFound } from "next/navigation";
+import { getPost } from "@/lib/strapi";
+import ShareButtons from "./ShareButtons";      // small client component
+import TableOfContents from "./TableOfContents"; // small client component
+
+export const revalidate = 3600;
+
+export default async function PostPage({ params }: { params: Promise&lt;{ category: string; slug: string }&gt; }) {
+  const { category, slug } = await params;
+  const post = await getPost(category, slug);
+  if (!post) notFound();
+  return (
+    &lt;article&gt;
+      &lt;h1&gt;{post.title}&lt;/h1&gt;
+      &lt;TableOfContents headings={post.headings} /&gt;
+      &lt;div dangerouslySetInnerHTML={{ __html: post.html }} /&gt;
+      &lt;ShareButtons url={post.url} /&gt;
+    &lt;/article&gt;
+  );
+}</pre></li>
+      <li>Move browser-only code into <code>useEffect</code> inside the small client components; wrap any component using <code>useSearchParams()</code> in its own <code>&lt;Suspense&gt;</code>.</li>
+      <li>Remove the "Loading blog details" fallback around the article.</li></ol></dd>
+    <dt>Done when</dt><dd>Any post's raw HTML contains its <code>&lt;h1&gt;</code> and body text, and no <code>&lt;!--$!--&gt;</code> wraps the article.</dd>
+  </dl>
+  <figure class="rec"><img src="gifs/01_old-post_rendering-gtm-cookie.gif" alt="Old post: inspector shows the loading placeholder in the raw HTML and the full article only after JavaScript" loading="lazy" width="1536" height="695"><figcaption>Recording: old post. Panel section 1 = raw HTML (placeholder YES, 0 H1); section 2 = after JavaScript (1 H1, 906 words).</figcaption></figure>
+</template>
+
+<template id="tech-3">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>Every page has three Suspense boundaries that failed or bailed out on the server, right before the GTM <code>&lt;noscript&gt;</code>; posts have a fourth (the article, see the first card). They're likely the site-wide client components: analytics loader, HubSpot loader, cookie banner.</dd>
+    <dt>Evidence</dt><dd><pre>&lt;!--$!--&gt;&lt;template data-dgst=""&gt;&lt;/template&gt;&lt;!--/$--&gt;
+&lt;!--$!--&gt;&lt;template data-dgst=""&gt;&lt;/template&gt;&lt;!--/$--&gt;
+&lt;!--$!--&gt;&lt;template data-dgst=""&gt;&lt;/template&gt;&lt;!--/$--&gt;
+&lt;noscript&gt;&lt;iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M3GBTJ" ...</pre></dd>
+    <dt>Fix</dt><dd><ol>
+      <li>List the components rendered just before the GTM <code>&lt;noscript&gt;</code> in the root layout; remove one at a time and re-check <code>curl -s / | grep -c '&lt;!--\$!--&gt;'</code>.</li>
+      <li>If a component is meant to run only in the browser, make that explicit so it renders nothing on the server instead of erroring:
+<pre>// components/ClientOnly.tsx
+"use client";
+import { useEffect, useState } from "react";
+export default function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() =&gt; setReady(true), []);
+  return ready ? &lt;&gt;{children}&lt;/&gt; : null;
+}
+// app/layout.tsx
+&lt;ClientOnly&gt;&lt;CookieBanner /&gt;&lt;/ClientOnly&gt;</pre></li>
+      <li>If it throws on the server (e.g. reads <code>localStorage</code> at the top of the component), move that read into <code>useEffect</code>.</li></ol></dd>
+    <dt>Done when</dt><dd><code>curl -s &lt;url&gt; | grep -c '&lt;!--\$!--&gt;'</code> returns 0 on service pages.</dd>
+  </dl>
+</template>
+
+<template id="tech-4">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>Page entry #7 "Cypress Automation" (slug <code>services/software-testing/cypress-automation</code>) is published in Strapi, but the URL returns HTTP 404 and is still in the sitemap. Other entries in the same collection with the same slug pattern work (e.g. insurance-testing, #18).</dd>
+    <dt>Likely cause</dt><dd>Static params or ISR cache not refreshed after publish (<code>dynamicParams = false</code>, or no revalidation webhook), or the route's Strapi query filters on a field this entry doesn't have. Compare entry #7 with #18.</dd>
+    <dt>Fix</dt><dd><ol>
+      <li>Allow new slugs to render on demand:
+<pre>// the route that serves page-collection entries
+export const dynamicParams = true;
+export const revalidate = 3600;</pre></li>
+      <li>Revalidate on publish with a route Strapi can call:
+<pre>// app/api/revalidate/route.ts
+import { revalidatePath } from "next/cache";
+export async function POST(req: Request) {
+  if (req.headers.get("x-revalidate-secret") !== process.env.REVALIDATE_SECRET)
+    return new Response("Unauthorized", { status: 401 });
+  const { model, entry } = await req.json();
+  const path = "/" + String(entry?.slug ?? "").replace(/^\/|\/$/g, "") + "/";
+  revalidatePath(path);
+  revalidatePath("/sitemap.xml");
+  return Response.json({ revalidated: path, model });
+}</pre>
+        In Strapi: <i>Settings → Webhooks → Create</i>, URL <code>https://thinksys.com/api/revalidate</code>, header <code>x-revalidate-secret</code>, events Entry publish / unpublish / update.</li>
+      <li>Deploy, republish entry #7 and confirm the URL returns 200.</li></ol></dd>
+    <dt>Done when</dt><dd>The Cypress page returns 200, and publishing a new page makes it live without a rebuild.</dd>
+  </dl>
+  <figure class="rec"><img src="gifs/06_page-collection_404-and-soft-404.gif" alt="Cypress page shows Page Not Found; microservices slug 404; healthcare-testing slug shows Page Not Found" loading="lazy" width="1536" height="695"><figcaption>Recording: Cypress 404, the microservices slug 404, and <code>/healthcare-testing/</code>.</figcaption></figure>
+</template>
+
+<template id="tech-5">
+  <dl class="td">
+    <dt>What's wrong</dt><dd><ul>
+      <li>Page #1 (Healthcare) has slug <code>healthcare-testing</code>, but the page lives at <code>/services/software-testing/healthcare-testing/</code>. The slug URL <code>/healthcare-testing/</code> shows "Page Not Found" while returning <b>HTTP 200</b> with <code>noindex</code> (a soft 404).</li>
+      <li>Page #20 (Microservices) has slug <code>services/microservices-testing</code>, which returns 404; the page works at <code>/services/software-testing/microservices-testing/</code>.</li></ul></dd>
+    <dt>Reproduce</dt><dd><pre>curl -s -o /dev/null -w "%{http_code}\n" https://thinksys.com/healthcare-testing/                # 200
+curl -s -o /dev/null -w "%{http_code}\n" https://thinksys.com/services/microservices-testing/   # 404</pre></dd>
+    <dt>Fix</dt><dd><ol>
+      <li>Use the slug as the one source of truth: store the full path and resolve pages by exact match.</li>
+      <li>Correct the two slugs (agree with marketing) and add 301s in <code>next.config</code>:
+<pre>async redirects() {
+  return [
+    { source: "/healthcare-testing", destination: "/services/software-testing/healthcare-testing/", permanent: true },
+    { source: "/services/microservices-testing", destination: "/services/software-testing/microservices-testing/", permanent: true },
+  ];
+}</pre></li>
+      <li>Return a real 404 wherever "Page Not Found" is shown: call <code>notFound()</code> from the page instead of rendering the not-found component manually.
+<pre>const page = await getPageByPath(path);
+if (!page) notFound();   // status 404, not 200</pre></li></ol></dd>
+    <dt>Done when</dt><dd>Every "Page Not Found" response has status 404, and each page entry is reachable at the URL its slug implies.</dd>
+  </dl>
+</template>
+
+<template id="tech-6">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>The blog template renders schema with <code>next/script strategy="beforeInteractive"</code>, but that component sits inside the client-rendered part from the first card. A <code>beforeInteractive</code> script that only mounts after hydration is never inserted, so there's no JSON-LD in the HTML or in the browser. 307 posts have <code>seo.structuredData</code> filled in Strapi; none output it.</dd>
+    <dt>Evidence</dt><dd>RSC payload of <code>/development/mobile-choices/</code>:
+<pre>["$","$L30",null,{"id":"structured-data-script","strategy":"beforeInteractive",
+  "type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"$31"}}]</pre>
+      After full load in Chrome: <code>document.querySelectorAll('script[type="application/ld+json"]').length === 0</code>. Google Rich Results Test on <code>/qa-testing/qa-roi-guide/</code>: "No items detected".</dd>
+    <dt>Fix</dt><dd><ol>
+      <li>One shared server component (no <code>"use client"</code>, no <code>next/script</code>):
+<pre>// components/JsonLd.tsx
+export default function JsonLd({ data }: { data: unknown }) {
+  if (!data) return null;
+  const json = typeof data === "string" ? data : JSON.stringify(data);
+  return &lt;script type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: json.replace(/&lt;/g, "\\u003c") }} /&gt;;
+}</pre></li>
+      <li>Render it in the blog page Server Component, with a fallback when Strapi is empty:
+<pre>const jsonLd = post.seo?.structuredData ?? {
+  "@context": "https://schema.org", "@type": "BlogPosting",
+  headline: post.title, image: post.featuredImage?.url,
+  datePublished: post.publishedAt, dateModified: post.updatedAt,
+  author: { "@type": "Person", name: post.author?.name ?? "ThinkSys" },
+  publisher: { "@type": "Organization", name: "ThinkSys" },
+  mainEntityOfPage: canonicalUrl,
+};
+return (&lt;&gt;&lt;JsonLd data={jsonLd} /&gt;&lt;article&gt;...&lt;/article&gt;&lt;/&gt;);</pre></li>
+      <li>Delete the existing <code>&lt;Script id="structured-data-script" strategy="beforeInteractive" ...&gt;</code> from the blog template.</li></ol></dd>
+    <dt>Done when</dt><dd><code>curl -s &lt;post&gt; | grep -c 'type="application/ld+json"'</code> ≥ 1, and Google's Rich Results Test detects BlogPosting.</dd>
+  </dl>
+  <figure class="rec"><img src="gifs/02_blog-post_rendering-gtm-cookie.gif" alt="New blog post: no JSON-LD even after JavaScript" loading="lazy" width="1536" height="695"><figcaption>Recording: new blog post. Section 2 "JSON-LD scripts: 0" even after JavaScript.</figcaption></figure>
+</template>
+
+<template id="tech-7">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>Service and QA pages push JSON-LD through <code>self.__next_s</code> (<code>next/script</code>); page-collection pages don't even do that on 15 of 17 pages: the schema is built only in the browser. Google sees it after rendering; crawlers that don't run JavaScript don't.</dd>
+    <dt>Evidence</dt><dd>Raw HTML: 0 matches for <code>type="application/ld+json"</code>. After load: 1 JSON-LD script. Google Rich Results Test on <code>/services/software-testing/api-testing/</code>: 3 valid items (Breadcrumbs, Local business, Organization).</dd>
+    <dt>Fix</dt><dd><ol>
+      <li>Use the same <code>JsonLd</code> server component as the blog fix in the service, QA service and page-collection templates, passing <code>entry.seo.structuredData</code>.</li>
+      <li>Remove the <code>next/script</code> JSON-LD (the <code>__next_s</code> push) and, in the page-collection template, the client component that builds schema in the browser.</li>
+      <li>Optional fallback when Strapi's field is empty:
+<pre>const jsonLd = entry.seo?.structuredData ?? {
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "Service", name: entry.title, url: canonicalUrl,
+      provider: { "@type": "Organization", name: "ThinkSys" }, areaServed: "US" },
+    { "@type": "BreadcrumbList", itemListElement: breadcrumbs.map((b, i) =&gt;
+      ({ "@type": "ListItem", position: i + 1, name: b.name, item: b.url })) },
+  ],
+};</pre></li>
+      <li>Check the page-collection component that adds schema not in Strapi (e.g. Product, Review, Person on insurance-testing).</li></ol></dd>
+    <dt>Done when</dt><dd>The raw HTML of each template contains a real <code>&lt;script type="application/ld+json"&gt;</code> tag.</dd>
+  </dl>
+  <figure class="rec"><img src="gifs/03_qa-service-page_gtm-cookie-schema.gif" alt="QA service page: JSON-LD tags 0 in raw HTML, 1 via __next_s, 1 after JavaScript" loading="lazy" width="1536" height="695"><figcaption>Recording: QA service page. Raw HTML "JSON-LD tags: 0, via __next_s: 1"; after JavaScript "JSON-LD scripts: 1".</figcaption></figure>
+  <figure class="rec"><img src="gifs/04_page-collection_gtm-cookie-schema.gif" alt="Page-collection page: schema neither in raw HTML nor __next_s" loading="lazy" width="1536" height="695"><figcaption>Recording: page collection. "JSON-LD tags: 0, via __next_s: 0"; it appears only after JavaScript.</figcaption></figure>
+</template>
+
+<template id="tech-8">
+  <dl class="td">
+    <dt>What's wrong</dt><dd><code>og:type</code> is <code>website</code> on every post; no <code>article:published_time</code>, <code>article:modified_time</code>, <code>article:author</code> or <code>&lt;meta name="author"&gt;</code>, even where Strapi has an author linked.</dd>
+    <dt>Fix</dt><dd>In the blog route's <code>generateMetadata</code>:
+<pre>export async function generateMetadata({ params }): Promise&lt;Metadata&gt; {
+  const { category, slug } = await params;
+  const post = await getPost(category, slug);
+  return {
+    title: post.seo.metaTitle,
+    description: post.seo.metaDescription,
+    authors: post.author ? [{ name: post.author.name, url: post.author.url }] : undefined,
+    openGraph: {
+      type: "article",
+      publishedTime: post.publishedAt,
+      modifiedTime: post.updatedAt,
+      authors: post.author?.url ? [post.author.url] : undefined,
+    },
+  };
+}</pre>
+      For <code>old_post</code> use its <code>date</code> / <code>dateModify</code> fields.</dd>
+    <dt>Done when</dt><dd>Any post's raw HTML has <code>og:type="article"</code> and both article times.</dd>
+  </dl>
+</template>
+
+<template id="tech-9">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>When <code>seo.metaImage</code> is empty there's no <code>og:image</code>: service 2, QA service 19 of 19, page collection 13 of 17, blog 13, old post 352. New blog posts already fall back to the featured image; other templates don't. When <code>seo.canonicalURL</code> is empty there's no canonical tag (service 1, blog 7, old post 4).</dd>
+    <dt>Fix</dt><dd>One shared helper used by every template's <code>generateMetadata</code>:
+<pre>// lib/seo.ts
+const SITE = "https://thinksys.com";
+const DEFAULT_IMAGE = SITE + "/og-default.png"; // 1200x630, add to /public
+
+export function buildMeta(entry, path: string): Metadata {
+  const seo = entry.seo ?? {};
+  const canonical = normalizeCanonical(seo.canonicalURL) ?? SITE + path;
+  const image = seo.metaImage?.url ?? entry.featuredImage?.url ?? entry.heroImage?.url ?? DEFAULT_IMAGE;
+  return {
+    metadataBase: new URL(SITE),
+    title: seo.metaTitle,
+    description: seo.metaDescription,
+    alternates: { canonical },
+    openGraph: { url: canonical, images: [{ url: image, width: 1200, height: 630 }] },
+    twitter: { card: "summary_large_image", images: [image] },
+  };
+}</pre></dd>
+    <dt>Done when</dt><dd>Every page has exactly one canonical tag and an <code>og:image</code>.</dd>
+  </dl>
+</template>
+
+<template id="tech-10">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>Spaces in the Strapi value are printed as-is, producing invalid URLs, e.g. <code>" https://thinksys.com /qa-testing/playwright-vs-selenium-vs-cypress/"</code>. Affects blog entries #49, #48, #41 and #58.</dd>
+    <dt>Fix</dt><dd>
+<pre>export function normalizeCanonical(raw?: string | null): string | null {
+  if (!raw) return null;
+  let u = raw.replace(/\s+/g, "");
+  if (u.startsWith("/")) u = "https://thinksys.com" + u;
+  try {
+    const url = new URL(u);
+    url.protocol = "https:";
+    url.hostname = url.hostname.replace(/^www\./, "");
+    url.search = ""; url.hash = "";
+    if (!url.pathname.endsWith("/")) url.pathname += "/";
+    return url.toString();
+  } catch { return null; }   // invalid -&gt; fall back to the page's own URL
+}</pre>
+      Optionally apply the same cleanup in a Strapi <code>beforeCreate</code>/<code>beforeUpdate</code> lifecycle hook.</dd>
+    <dt>Done when</dt><dd>No canonical tag contains whitespace.</dd>
+  </dl>
+</template>
+
+<template id="tech-11">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>118 old posts store Yoast templates (<code>%title% %sep% %sitename%</code>, <code>%currentyear%</code>). The frontend fills them, but outputs "How to Build a SaaS Application?&nbsp;&nbsp;-&nbsp;&nbsp;Thinksys Inc." with doubled spaces and the old brand name.</dd>
+    <dt>Fix</dt><dd>
+<pre>export function fillTemplate(text: string, ctx: { title: string }): string {
+  return text
+    .replace(/%title%/gi, ctx.title)
+    .replace(/%sitename%/gi, "ThinkSys")
+    .replace(/%sep%/gi, "|")
+    .replace(/%currentyear%/gi, String(new Date().getUTCFullYear()))
+    .replace(/%[a-z_]+%/gi, "")
+    .replace(/\s*\|\s*(\|\s*)+/g, " | ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}</pre>
+      Also replace any hard-coded "Thinksys Inc." suffix with "ThinkSys".</dd>
+    <dt>Done when</dt><dd>No live title contains a double space or "Thinksys Inc.".</dd>
+  </dl>
+</template>
+
+<template id="tech-12">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>The GTM container isn't in the HTML. A client component adds it on the first <code>scroll</code>, <code>mousemove</code> or <code>touchstart</code> with no fallback, so visitors who don't interact aren't tracked by any GTM tag (GA4 <code>G-6PT2G4WMZC</code>, Ads <code>AW-17043520935</code>/<code>AW-11221760516</code>, LinkedIn, Bing, Clarity, ZoomInfo, Apollo).</dd>
+    <dt>Evidence</dt><dd>Current code in <code>/_next/static/chunks/1tl7s5icm9nlj.js</code> (formatted, re-checked 18 Nov):
+<pre>useEffect(() =&gt; {
+  let done = false;
+  const load = () =&gt; { if (done) return; done = true;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ "gtm.start": Date.now(), event: "gtm.js" });
+    const s = document.createElement("script"); s.async = true;
+    s.src = "https://www.googletagmanager.com/gtm.js?id=GTM-M3GBTJ";
+    document.head.appendChild(s); };
+  window.addEventListener("scroll", load, { once: true });
+  window.addEventListener("mousemove", load, { once: true });
+  window.addEventListener("touchstart", load, { once: true });
+}, []);</pre></dd>
+    <dt>Fix</dt><dd><b>Option A (recommended):</b> load GTM normally and control timing inside GTM.
+<pre>// app/layout.tsx
+import { GoogleTagManager } from "@next/third-parties/google";
+export default function RootLayout({ children }) {
+  return (
+    &lt;html lang="en"&gt;
+      &lt;GoogleTagManager gtmId="GTM-M3GBTJ" /&gt;
+      &lt;body&gt;{children}&lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</pre>
+      Then remove the scroll/mousemove loader component.<br><br>
+      <b>Option B:</b> keep the delay but add fallbacks:
+<pre>const events = ["scroll", "mousemove", "touchstart", "keydown", "pointerdown"];
+events.forEach(e =&gt; window.addEventListener(e, load, { once: true, passive: true }));
+if ("requestIdleCallback" in window) requestIdleCallback(load, { timeout: 2500 });
+else setTimeout(load, 2500);
+document.addEventListener("visibilitychange", load, { once: true });</pre>
+      Either way, push the consent defaults from the cookie card <b>before</b> GTM loads.</dd>
+    <dt>Done when</dt><dd>Without touching the page, <code>gtm.js?id=GTM-M3GBTJ</code> loads within 5 s and GTM Preview shows "Container Loaded".</dd>
+  </dl>
+  <figure class="rec"><img src="gifs/05_service-page_gtm-cookie-schema.gif" alt="Service page: GTM NO until scroll, then YES" loading="lazy" width="1536" height="695"><figcaption>Recording: service page. Section 3 "GTM-M3GBTJ loaded: NO" until the scroll, then "YES".</figcaption></figure>
+</template>
+
+<template id="tech-13">
+  <dl class="td">
+    <dt>What's wrong</dt><dd><ul>
+      <li><b>Before an answer:</b> GA4, Google Ads, Facebook, LinkedIn, Clarity and HubSpot fire; tracking cookies are set (<code>_ga</code>, <code>_gcl_au</code>, <code>_fbp</code>, <code>_clck</code>, <code>hubspotutk</code>, <code>_uetsid</code>, <code>_zitok</code>).</li>
+      <li><b>After Reject:</b> the banner only writes <code>localStorage.cookieConsent = {"value":"false",...}</code>; nothing reads it. All the same tags still fire and existing cookies stay.</li>
+      <li><b>No Google Consent Mode:</b> no <code>gtag('consent', ...)</code> entries in <code>dataLayer</code>.</li>
+      <li><b>Outside GTM:</b> HubSpot's ads script (<code>js-na2.hsadspixel.net/pixels.js</code>) loads the Facebook pixel and Google Ads by itself ~9 s after load, with no interaction and no consent check.</li></ul></dd>
+    <dt>Evidence</dt><dd>Re-checked 18 Nov in desktop Chrome. Banner unanswered on <code>/qa-testing/qa-roi-guide/</code>: GA4 1, Ads 8, Facebook 1, LinkedIn 3, Clarity 7, HubSpot 2. After Reject on <code>/services/cloud-computing/</code>: GA4 1, Ads 7, Facebook 3, LinkedIn 3, Clarity 7, HubSpot 2. On <code>/healthcare-testing/</code>: no <code>gtm.js</code> request, yet <code>hsadspixel</code> at 8.6 s, Facebook at 9.0 s, Google Ads at 9.1 s.</dd>
+    <dt>Fix</dt><dd><ol>
+      <li>Agree with the privacy owner which regions need opt-in (EEA, UK, Switzerland at minimum).</li>
+      <li>Push Consent Mode v2 defaults before GTM, reading the saved choice:
+<pre>// app/layout.tsx, inside &lt;head&gt;, before GoogleTagManager
+&lt;script dangerouslySetInnerHTML={{ __html: `
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem('cookieConsent') || 'null'); } catch (e) {}
+  var v = saved &amp;&amp; saved.value === 'true' ? 'granted' : 'denied';
+  gtag('consent', 'default', { ad_storage: v, analytics_storage: v,
+    ad_user_data: v, ad_personalization: v, wait_for_update: 500 });
+`}} /&gt;</pre></li>
+      <li>Make Accept / Reject update consent and clean up on Reject:
+<pre>function saveConsent(granted: boolean) {
+  localStorage.setItem("cookieConsent",
+    JSON.stringify({ value: String(granted), expires: Date.now() + 180 * 864e5 }));
+  const v = granted ? "granted" : "denied";
+  window.gtag?.("consent", "update",
+    { ad_storage: v, analytics_storage: v, ad_user_data: v, ad_personalization: v });
+  window.dataLayer?.push({ event: granted ? "consent_granted" : "consent_denied" });
+  if (!granted) {
+    (window as any)._hsp = (window as any)._hsp || [];
+    (window as any)._hsp.push(["revokeCookieConsent"]);   // HubSpot
+    // also expire _ga, _ga_*, _gid, _gcl_au, _fbp, _clck, _clsk, _uetsid, _uetvid, _zitok
+  }
+}</pre></li>
+      <li>In GTM: enable consent overview; Google tags follow Consent Mode automatically. For Facebook, LinkedIn, Clarity, Bing, ZoomInfo, Apollo set <i>Additional consent checks</i> or fire them on <code>consent_granted</code> instead of All Pages.</li>
+      <li>HubSpot: load its script only after consent (or turn on HubSpot's consent settings), and turn off HubSpot's ad pixels if Facebook and Google Ads are managed in GTM.</li></ol></dd>
+    <dt>Done when</dt><dd>After Reject, no requests to <code>facebook.com/tr</code>, <code>px.ads.linkedin.com</code>, <code>clarity.ms</code>, <code>hs-analytics</code>, <code>zi-scripts</code>; GA4 hits carry <code>gcs=G100</code>. After Accept, everything fires normally.</dd>
+  </dl>
+  <figure class="rec"><img src="gifs/01_old-post_rendering-gtm-cookie.gif" alt="Old post with cookieConsent false: trackers fire after a scroll" loading="lazy" width="1536" height="695"><figcaption>Recording made after Reject (<code>cookieConsent: false</code>): GA4, Ads, Facebook, LinkedIn, Clarity, HubSpot, Bing and ZoomInfo fire after one scroll.</figcaption></figure>
+  <figure class="rec"><img src="gifs/06_page-collection_404-and-soft-404.gif" alt="healthcare-testing page: Facebook and Google Ads requests while GTM is not loaded" loading="lazy" width="1536" height="695"><figcaption>Last frame: Facebook and Google Ads requests while GTM is not loaded, started by HubSpot's ads pixel.</figcaption></figure>
+</template>
+
+<template id="tech-14">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>Five URLs have two published Strapi entries; the route picks one and the sitemap lists the URL twice: <code>/qa-testing/complete-bug-triage-meeting-process/</code> (blog #69, old_post #2646), <code>/qa-testing/saas-performance-testing/</code> (blog #71, old_post #2708), <code>/qa-testing/top-qa-interview-question-answer/</code> (blog #73, old_post #2984), <code>/qa-testing/complete-guide-to-stlc/</code> (old_post #2768, #2797), <code>/qa-testing/testing-blockchain/</code> (old_post #2779, #2810).</dd>
+    <dt>Fix</dt><dd><ol>
+      <li>Marketing unpublishes the older copy of each pair.</li>
+      <li>Deterministic lookup:
+<pre>async function getPostByPath(path: string) {
+  const [blog, old] = await Promise.all([findBlogByPath(path), findOldPostsByPath(path)]);
+  if (blog) return blog;
+  return old.sort((a, b) =&gt; +new Date(b.updatedAt) - +new Date(a.updatedAt))[0] ?? null;
+}</pre></li>
+      <li>Block new duplicates with a Strapi lifecycle hook on both collections (<code>beforeCreate</code>/<code>beforeUpdate</code> that queries blog + post for the same path and throws <code>ApplicationError("Another entry already uses this URL")</code>).</li>
+      <li>Deduplicate sitemap URLs.</li></ol></dd>
+    <dt>Done when</dt><dd>Each URL maps to exactly one entry and appears once in the sitemap.</dd>
+  </dl>
+</template>
+
+<template id="tech-15">
+  <dl class="td">
+    <dt>What's wrong</dt><dd>On 17 Nov a crawler sending 10 requests at a time received <code>403 ERROR – The request could not be satisfied (Request blocked)</code> from CloudFront and stayed blocked for a while. Fine against abuse, but it must not catch search engines or SEO tools.</dd>
+    <dt>Fix</dt><dd><ol>
+      <li>AWS Console → WAF &amp; Shield → the Web ACL on the thinksys.com CloudFront distribution → find the rule that blocked (likely rate-based).</li>
+      <li>Add the AWS managed <i>Bot Control</i> rule group (Common, Count mode) and scope the rate rule to requests <b>without</b> the label <code>awswaf:managed:aws:bot-control:bot:verified</code>.</li>
+      <li>Allow-list the SEO tools you use (Semrush, Ahrefs, Screaming Frog) before the rate rule.</li>
+      <li>Watch Search Console → Settings → Crawl stats for 403s before and after.</li></ol></dd>
+    <dt>Done when</dt><dd>No rise in 403s in crawl stats, and a Semrush site audit completes.</dd>
+  </dl>
+</template>
+
+<script>
+const TEMPLATES = {
+  service: { name: "Service page", ex: "https://thinksys.com/services/cloud-computing/", note: "Collection: service" },
+  qa:      { name: "QA service page", ex: "https://thinksys.com/services/software-testing/api-testing/", note: "Collection: software_testings" },
+  page:    { name: "Section-built QA page", ex: "https://thinksys.com/services/software-testing/insurance-testing/", note: "Collection: page" },
+  blog:    { name: "Blog post (new)", ex: "https://thinksys.com/qa-testing/qa-roi-guide/", note: "Collection: blog" },
+  old:     { name: "Old post", ex: "https://thinksys.com/development/mobile-choices/", note: "Collection: old_post" },
+};
+const RR = u => "https://search.google.com/test/rich-results?url=" + encodeURIComponent(u);
+const LI = u => "https://www.linkedin.com/post-inspector/inspect/" + encodeURIComponent(u);
+
+// steps: array of { t: html text, open?: url, open2?: [label,url], find?: text }
+const ISSUES = [
+  { id: 1, p1: true, on: ["blog", "old"], title: "Search engines get a blank \"loading\" page instead of the article",
+    plain: "Visitors see the full post, but the raw page the server sends has only a loading placeholder. Google has to come back later to read it; Bing, LinkedIn previews and AI tools often never do.",
+    url: { blog: "https://thinksys.com/qa-testing/qa-roi-guide/", old: "https://thinksys.com/development/mobile-choices/" },
+    steps: t => [
+      { t: "Open the post. Point out that it looks complete.", open: true },
+      { t: "Press <kbd>Ctrl</kbd>+<kbd>U</kbd> to see the raw page, then <kbd>Ctrl</kbd>+<kbd>F</kbd> and search for:", find: "Loading blog details" },
+      { t: "Now search for a heading tag:", find: "<h1" },
+    ],
+    now: "\"Loading blog details\" is found. <code>&lt;h1</code> finds 0 results.", should: "The article text and its <code>&lt;h1&gt;</code> heading are in the raw page; no placeholder.",
+    ask: "Please make blog posts render their article on the server, like the service pages do." },
+  { id: 3, on: ["service", "qa", "page", "blog", "old"], sitewide: true, title: "Three parts of every page fail to build on the server",
+    plain: "Three site-wide components (probably the analytics loader, HubSpot and the cookie banner) silently fail on the server and get built in the browser instead. Visitors don't see an error, but it's wasted work on every page.",
+    steps: t => [
+      { t: "Open the page and press <kbd>Ctrl</kbd>+<kbd>U</kbd>.", open: true },
+      { t: "Search for this marker:", find: "<!--$!-->" },
+    ],
+    now: "3 results on service pages (4 on blog posts).", should: "0 results.",
+    ask: "Please find the three components behind the <!--$!--> markers and fix them so they don't fail on the server." },
+  { id: 4, p1: true, on: ["page"], title: "A published page shows \"Page Not Found\"",
+    plain: "The Cypress Automation page is published in Strapi but the website shows a 404 error.",
+    url: { page: "https://thinksys.com/services/software-testing/cypress-automation/" },
+    steps: t => [
+      { t: "Open the page.", open: true },
+      { t: "In Strapi: <b>Content Manager → Page → Cypress Automation</b>. Show that its status is <b>Published</b>.", open2: ["Open Strapi", "https://strapibackend.thinksys.com/admin/content-manager/collection-types/api::page.page"] },
+    ],
+    now: "Website: \"Page Not Found\". Strapi: Published.", should: "The page is live at that URL.",
+    ask: "Please make published Strapi pages go live without a rebuild (refresh the site when an entry is published)." },
+  { id: 5, on: ["page"], title: "A \"Page Not Found\" screen that tells Google the page is fine",
+    plain: "Two pages have a different address in Strapi than on the site. One of those addresses shows \"Page Not Found\" but tells search engines everything is OK (status 200 instead of 404).",
+    url: { page: "https://thinksys.com/healthcare-testing/" },
+    steps: t => [
+      { t: "Open this address. It shows \"Page Not Found\".", open: true },
+      { t: "Press <kbd>F12</kbd>, click <b>Network</b>, press <kbd>F5</kbd>. In the first row (<code>healthcare-testing/</code>) look at the <b>Status</b> column." },
+      { t: "Also open the Microservices page's Strapi address, which shows 404:", open2: ["Open /services/microservices-testing/", "https://thinksys.com/services/microservices-testing/"] },
+    ],
+    now: "\"Page Not Found\" with status <b>200</b>.", should: "Status 404, and Strapi addresses that match the live pages.",
+    ask: "Please return a real 404 status on not-found pages, and use the Strapi slug as the one source of the page address." },
+  { id: 6, p1: true, on: ["blog", "old"], title: "Blog posts never show their structured data to Google",
+    plain: "Structured data (schema) helps Google understand a page and show rich results. Many posts have it filled in Strapi, but the blog template never puts it on the page.",
+    url: { blog: "https://thinksys.com/qa-testing/qa-roi-guide/", old: "https://thinksys.com/development/mobile-choices/" },
+    steps: t => [
+      { t: "Open Google's Rich Results Test for this post. It loads the page like Google does.", open2: ["Test in Google", "RR"] },
+      { t: "Wait for the result, then show what was detected." },
+    ],
+    now: "Google shows \"No items detected\".", should: "Article (BlogPosting) detected, plus FAQ and breadcrumbs where Strapi has them.",
+    ask: "Please output the Strapi structuredData on blog posts as a normal JSON-LD script in the page." },
+  { id: 7, on: ["service", "qa", "page"], title: "Structured data only appears after JavaScript runs",
+    plain: "Google can see the schema on these pages (it runs JavaScript), but the raw page doesn't contain it, so other search engines and AI tools miss it.",
+    steps: t => [
+      { t: "Open the page and press <kbd>Ctrl</kbd>+<kbd>U</kbd>.", open: true },
+      { t: "Search for a schema tag:", find: 'type="application/ld+json"' },
+      { t: "Then show that Google does find it after running JavaScript:", open2: ["Test in Google", "RR"] },
+    ],
+    now: "Raw page: 0 results. Google's test: valid items found (e.g. 3 on API testing).", should: "The schema tag is in the raw page too.",
+    ask: "Please render the JSON-LD as a script tag on the server instead of adding it with JavaScript." },
+  { id: 8, on: ["blog", "old"], title: "Posts are labelled as plain web pages, with no publish date",
+    plain: "Social networks and Google read special tags to know a page is an article and when it was published. Every post says \"website\" and has no date or author tag.",
+    url: { blog: "https://thinksys.com/qa-testing/qa-roi-guide/", old: "https://thinksys.com/development/mobile-choices/" },
+    steps: t => [
+      { t: "Open the post and press <kbd>Ctrl</kbd>+<kbd>U</kbd>.", open: true },
+      { t: "Search for:", find: "og:type" },
+      { t: "Then search for:", find: "article:published_time" },
+    ],
+    now: "<code>og:type</code> = \"website\". No published-time tag.", should: "<code>og:type</code> = \"article\", with published and modified dates and the author.",
+    ask: "Please set og:type to article and add article:published_time, modified_time and author on blog posts." },
+  { id: 9, on: ["service", "qa", "page", "blog", "old"], title: "Shared links show no image",
+    plain: "When there's no share image in Strapi, the page doesn't fall back to its main image, so LinkedIn and Slack previews are blank. Pages with no canonical in Strapi also get none.",
+    url: { service: "https://thinksys.com/services/convenience-store-solutions/", qa: "https://thinksys.com/services/software-testing/api-testing/", page: "https://thinksys.com/services/software-testing/insurance-testing/", blog: "https://thinksys.com/qa-testing/conduct-usability-testing/", old: "https://thinksys.com/development/mobile-choices/" },
+    steps: t => [
+      { t: "Open the page, press <kbd>Ctrl</kbd>+<kbd>U</kbd> and search for:", find: "og:image", open: true },
+      { t: "Optional, if you're signed in to LinkedIn: see the share preview in Post Inspector.", open2: ["Open LinkedIn Post Inspector", "LI"] },
+    ],
+    now: "Preview without an image; <code>og:image</code> not found.", should: "Every page has a share image (Strapi's, else the page's main image, else a default) and a canonical tag.",
+    ask: "Please add fallbacks: share image → featured/hero image → site default, and canonical → the page's own URL." },
+  { id: 10, on: ["blog"], title: "Some canonical links contain spaces",
+    plain: "A canonical link tells Google the page's official address. On four posts it contains a space, which makes it an invalid address.",
+    url: { blog: "https://thinksys.com/qa-testing/playwright-vs-selenium-vs-cypress/" },
+    steps: t => [
+      { t: "Open the post and press <kbd>Ctrl</kbd>+<kbd>U</kbd>.", open: true },
+      { t: "Search for:", find: "canonical" },
+    ],
+    now: "<code>https://thinksys.com /qa-testing/…</code> (a space before the path).", should: "<code>https://thinksys.com/qa-testing/playwright-vs-selenium-vs-cypress/</code>",
+    ask: "Please clean canonical values (remove spaces, add the trailing slash) before printing them." },
+  { id: 11, on: ["old"], title: "Old post titles end with \"  -  Thinksys Inc.\"",
+    plain: "118 old posts still use WordPress title templates. The site fills them in with double spaces and the old brand name.",
+    url: { old: "https://thinksys.com/development/build-a-saas-application/" },
+    steps: t => [
+      { t: "Open the post and look at the browser tab title (or press <kbd>Ctrl</kbd>+<kbd>U</kbd> and search <code>&lt;title&gt;</code>).", open: true },
+    ],
+    now: "\"How to Build a SaaS Application?&nbsp;&nbsp;-&nbsp;&nbsp;Thinksys Inc.\"", should: "\"How to Build a SaaS Application? | ThinkSys\"",
+    ask: "Please render %sitename% as ThinkSys and %sep% as |, and collapse double spaces, until marketing rewrites these titles." },
+  { id: 12, p1: true, on: ["service", "qa", "page", "blog", "old"], sitewide: true, title: "Analytics only start after the visitor moves the mouse or scrolls",
+    plain: "Google Tag Manager (GA4, Google Ads, LinkedIn and the rest) only loads after the first scroll, mouse move or touch. Visitors who read without moving aren't counted.",
+    steps: t => [
+      { t: "Open the page in Incognito. Press <kbd>F12</kbd>, click <b>Network</b>, and type in the filter box:", open: true, find: "gtm.js" },
+      { t: "Keep your mouse <b>over the DevTools panel</b>, press <kbd>F5</kbd> and wait 10 seconds. Nothing appears. (Even one mouse move or scroll over the page loads GTM, so don't touch the page.)" },
+      { t: "Now move the mouse over the page or scroll. <code>gtm.js</code> appears straight away." },
+    ],
+    now: "GTM loads only after a mouse move or scroll.", should: "GTM loads on every page view, without waiting for interaction.",
+    ask: "Please load GTM on page load (or add a 2–3 second fallback) instead of waiting for scroll/mousemove." },
+  { id: 13, p1: true, on: ["service", "qa", "page", "blog", "old"], sitewide: true, title: "Clicking \"Reject\" on the cookie banner doesn't stop tracking",
+    plain: "Facebook, Google Ads, LinkedIn, Clarity, HubSpot and others send data before visitors answer the banner, and still do after they click Reject. HubSpot also loads Facebook and Google Ads on its own, outside GTM.",
+    steps: t => [
+      { t: "Open the page in a <b>new Incognito window</b> so the cookie banner appears. Press <kbd>F12</kbd> → <b>Network</b> and filter for:", open: true, find: "facebook" },
+      { t: "Scroll the page without touching the banner. Facebook requests appear." },
+      { t: "Click <b>Reject</b>. Then <kbd>F12</kbd> → <b>Application</b> → <b>Local storage</b> → thinksys.com: show <code>cookieConsent</code> = false." },
+      { t: "Reload, scroll, and look at Network again. Facebook requests are still there. Try the filters <code>linkedin</code> and <code>clarity</code> too." },
+    ],
+    now: "Tracking runs before an answer and after Reject.", should: "Nothing except cookieless Google pings until the visitor clicks Accept.",
+    ask: "Please connect the cookie banner to Google Consent Mode and GTM consent settings, and stop HubSpot's ad pixels until consent." },
+  { id: 14, on: ["blog", "old"], title: "Some addresses have two published posts behind them",
+    plain: "Five URLs have two published entries in Strapi (one in blog and one in old_post, or two in old_post). The site picks one at random.",
+    url: { blog: "https://thinksys.com/qa-testing/complete-bug-triage-meeting-process/", old: "https://thinksys.com/qa-testing/complete-guide-to-stlc/" },
+    steps: t => [
+      { t: "In Strapi, open <b>Content Manager → old_post</b> and search for <code>complete-guide-to-stlc</code>: two published entries (#2768 and #2797).", open2: ["Open Strapi", "https://strapibackend.thinksys.com/admin/content-manager/collection-types/api::post.post"] },
+      { t: "Open the live page: only one of them is shown.", open: true },
+    ],
+    now: "Two published entries, one URL.", should: "One entry per URL, and Strapi refuses a second one.",
+    ask: "Please make the page lookup predictable and block two entries from using the same URL. (Marketing will unpublish the old copies.)" },
+  { id: 15, on: ["service", "qa", "page", "blog", "old"], sitewide: true, title: "The website firewall can block search engine crawlers",
+    plain: "During the audit, a fast crawler got blocked by the site's firewall (CloudFront). That's fine for attackers, but Google, Bing and SEO tools must never be blocked.",
+    steps: t => [
+      { t: "No live demo for this one. Show Search Console → <b>Settings → Crawl stats</b> → filter by response <b>403</b>, if any.", open2: ["Open Search Console", "https://search.google.com/search-console"] },
+    ],
+    now: "Our crawler was blocked with a 403.", should: "Verified Googlebot and Bingbot (and your SEO tools) are never rate-limited.",
+    ask: "Please check the AWS WAF rate rule exempts verified search engine bots and our SEO tools." },
+];
+
+// Where each issue was re-checked on 18 Nov 2026: template -> [example URL, what we saw, how]
+const T = "https://thinksys.com";
+const CONF = {
+  1: { blog: [T + "/qa-testing/qa-roi-guide/", "Raw page: \"Loading blog details\" ×2, 0 <h1>", "View source"],
+       old: [T + "/development/mobile-choices/", "Raw page: \"Loading blog details\" ×2, 0 <h1>", "View source"] },
+  3: { service: [T + "/services/cloud-computing/", "3 markers", "View source"], qa: [T + "/services/software-testing/api-testing/", "3 markers", "View source"],
+       page: [T + "/services/software-testing/insurance-testing/", "3 markers", "View source"], blog: [T + "/qa-testing/qa-roi-guide/", "4 markers", "View source"],
+       old: [T + "/development/mobile-choices/", "4 markers", "View source"] },
+  4: { page: [T + "/services/software-testing/cypress-automation/", "HTTP 404; entry #7 published in Strapi", "Page + Strapi"] },
+  5: { page: [T + "/healthcare-testing/", "\"Page Not Found\" with HTTP 200 + noindex; /services/microservices-testing/ = 404", "Network status"] },
+  6: { blog: [T + "/qa-testing/qa-roi-guide/", "Google Rich Results Test: \"No items detected\"; 0 schema after full load in Chrome", "Google test + Chrome"],
+       old: [T + "/development/mobile-choices/", "0 schema after full load in Chrome", "Chrome"] },
+  7: { service: [T + "/services/cloud-computing/", "Raw page 0, after load 1", "View source + Chrome"],
+       qa: [T + "/services/software-testing/api-testing/", "Raw page 0, after load 1; Google test: 3 valid items", "View source + Google test"],
+       page: [T + "/services/software-testing/insurance-testing/", "Raw page 0, after load 1", "View source + Chrome"] },
+  8: { blog: [T + "/qa-testing/qa-roi-guide/", "og:type = website, no published time", "View source"], old: [T + "/development/mobile-choices/", "og:type = website, no published time", "View source"] },
+  9: { service: [T + "/services/convenience-store-solutions/", "No og:image and no canonical", "View source"], qa: [T + "/services/software-testing/api-testing/", "No og:image", "View source"],
+       page: [T + "/services/software-testing/insurance-testing/", "No og:image", "View source"], blog: [T + "/qa-testing/conduct-usability-testing/", "No og:image", "View source"],
+       old: [T + "/development/mobile-choices/", "No og:image", "View source"] },
+  10: { blog: [T + "/qa-testing/playwright-vs-selenium-vs-cypress/", "canonical = \" https://thinksys.com /qa-testing/…\"", "View source"] },
+  11: { old: [T + "/development/build-a-saas-application/", "Title \"How to Build a SaaS Application?  -  Thinksys Inc.\"", "Tab title"] },
+  12: { blog: [T + "/qa-testing/qa-roi-guide/", "No GTM after 10 s without interaction", "Chrome"], old: [T + "/development/mobile-choices/", "No GTM after 10 s without interaction", "Chrome"],
+        qa: [T + "/services/software-testing/api-testing/", "No GTM after 10 s without interaction", "Chrome"],
+        service: [T + "/services/cloud-computing/", "Same site-wide loader code (scroll/mousemove/touch only)", "Site code"],
+        page: [T + "/services/software-testing/insurance-testing/", "Same site-wide loader code (scroll/mousemove/touch only)", "Site code"] },
+  13: { blog: [T + "/qa-testing/qa-roi-guide/", "Banner unanswered: GA4, Ads ×8, Facebook, LinkedIn ×3, Clarity ×7, HubSpot fired", "Chrome"],
+        service: [T + "/services/cloud-computing/", "After Reject: GA4, Ads ×7, Facebook ×3, LinkedIn ×3, Clarity ×7, HubSpot fired", "Chrome"],
+        page: [T + "/healthcare-testing/", "HubSpot loaded Facebook + Google Ads at ~9 s with no GTM", "Chrome"],
+        qa: [T + "/services/software-testing/api-testing/", "After Reject: GTM, GA4, Ads, Facebook, LinkedIn, Clarity fired (recording 3)", "Chrome"],
+        old: [T + "/development/mobile-choices/", "After Reject: GTM, GA4, Ads, Facebook, LinkedIn, Clarity fired (recording 1)", "Chrome"] },
+  14: { blog: [T + "/qa-testing/complete-bug-triage-meeting-process/", "blog #69 + old_post #2646 both published", "Strapi"],
+        old: [T + "/qa-testing/complete-guide-to-stlc/", "old_post #2768 + #2797 both published", "Strapi"] },
+  15: {},
+};
+
+const KEY = "showme-done-v1";
+let done = {}; try { done = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {} };
+let current = (location.hash || "").slice(1); if (!TEMPLATES[current]) current = "blog";
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const urlFor = (iss, t) => (iss.url && iss.url[t]) || TEMPLATES[t].ex;
+const strip = h => { const d = document.createElement("div"); d.innerHTML = h; return d.textContent; };
+
+function renderSwitch() {
+  const sw = document.getElementById("switch"); sw.innerHTML = "";
+  for (const [k, v] of Object.entries(TEMPLATES)) {
+    const n = ISSUES.filter(i => i.on.includes(k)).length;
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-pressed", String(k === current));
+    b.innerHTML = esc(v.name) + ' <span class="count">' + n + "</span>";
+    b.onclick = () => { current = k; history.replaceState(null, "", "#" + k); render(); };
+    sw.appendChild(b);
+  }
+}
+
+function render() {
+  renderSwitch();
+  const t = current, list = ISSUES.filter(i => i.on.includes(t));
+  const box = document.getElementById("cards"); box.innerHTML = "";
+  const head = document.createElement("p"); head.className = "muted";
+  head.innerHTML = "<b style='color:var(--fg)'>" + esc(TEMPLATES[t].name) + "</b> · " + esc(TEMPLATES[t].note) + " · example: <a href='" + TEMPLATES[t].ex + "' target='_blank' rel='noopener'>" + esc(TEMPLATES[t].ex.replace("https://thinksys.com", "")) + "</a>";
+  box.appendChild(head);
+  list.forEach((iss, idx) => {
+    const u = urlFor(iss, t), k = t + ":" + iss.id;
+    const card = document.createElement("article"); card.className = "card" + (done[k] ? " done" : "");
+    const stepsHtml = iss.steps(t).map(s => {
+      let acts = "";
+      if (s.open) acts += "<a class='btn solid' href='" + u + "' target='_blank' rel='noopener'>Open page ↗</a>";
+      if (s.open2) { const href = s.open2[1] === "RR" ? RR(u) : s.open2[1] === "LI" ? LI(u) : s.open2[1]; acts += "<a class='btn' href='" + esc(href) + "' target='_blank' rel='noopener'>" + esc(s.open2[0]) + " ↗</a>"; }
+      const find = s.find ? "<span class='find'><span>" + esc(s.find) + "</span><button type='button' data-copy='" + esc(s.find) + "'>Copy</button></span>" : "";
+      return "<li><div><span>" + s.t + "</span>" + (find ? "<div>" + find + "</div>" : "") + (acts ? "<div class='act'>" + acts + "</div>" : "") + "</div></li>";
+    }).join("");
+    card.innerHTML =
+      "<div class='top'><h2>" + (idx + 1) + ". " + esc(iss.title) + "</h2><div class='badges'>" +
+        (iss.p1 ? "<span class='badge p1'>High priority</span>" : "<span class='badge'>Medium</span>") +
+        (iss.sitewide ? "<span class='badge'>Same on every page type</span>" : "") + "</div></div>" +
+      "<p class='plain'>" + esc(iss.plain) + "</p>" +
+      "<div style='display:grid;gap:8px'><b style='font:600 13px var(--body);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)'>Show it</b><ol class='steps'>" + stepsHtml + "</ol></div>" +
+      "<div class='see'><div class='now'><b>What you'll see now</b><span>" + iss.now + "</span></div><div class='should'><b>What it should be</b><span>" + iss.should + "</span></div></div>" +
+      "<p class='ask'><b>Ask the developer:</b> " + esc(iss.ask) + "</p>" +
+      confirmedHtml(iss) +
+      "<div class='foot'><label class='check'><input type='checkbox' id='chk-" + t + "-" + iss.id + "'" + (done[k] ? " checked" : "") + "> Shown to developer</label>" +
+      "<span style='display:flex;gap:8px;align-items:center;flex-wrap:wrap'><span class='toast' role='status'></span><button type='button' class='btn' data-ticket='" + iss.id + "'>Copy as ticket</button></span></div>";
+    const tpl = document.getElementById("tech-" + iss.id);
+    if (tpl) {
+      const det = document.createElement("details"); det.className = "tech";
+      det.innerHTML = "<summary>Technical detail for developers <span class='muted' style='font-weight:400'>· evidence, fix with code, done-when</span></summary>";
+      det.appendChild(tpl.content.cloneNode(true));
+      card.insertBefore(det, card.querySelector(".foot"));
+    }
+    card.querySelector("input[type=checkbox]").onchange = e => { done[k] = e.target.checked; save(); card.classList.toggle("done", e.target.checked); progress(); };
+    box.appendChild(card);
+  });
+  progress();
+}
+
+function confirmedHtml(iss) {
+  const c = CONF[iss.id] || {};
+  const rows = Object.keys(TEMPLATES).map(k => {
+    const hit = c[k], affected = iss.on.includes(k);
+    const mark = hit ? "<span class='cf ok'>✓ Replicated</span>" : affected ? "<span class='cf'>Same code, not re-tested</span>" : "<span class='cf no'>Not affected</span>";
+    const detail = hit ? "<a href='" + hit[0] + "' target='_blank' rel='noopener'>" + esc(hit[0].replace(T, "")) + "</a> · " + esc(hit[1]) + " <span class='muted'>(" + esc(hit[2]) + ")</span>" : "";
+    return "<tr" + (k === current ? " class='cur'" : "") + "><td>" + esc(TEMPLATES[k].name) + "</td><td>" + mark + "</td><td>" + detail + "</td></tr>";
+  }).join("");
+  const note = iss.id === 15 ? "<p class='muted' style='font-size:13px'>Seen once during the audit (17 Nov). Not re-tested on purpose: re-testing means sending many requests to the live site.</p>" : "";
+  return "<details class='conf'><summary>Where this replicates (re-checked 18 Nov 2026)</summary><div class='cfwrap'><table class='cft'><thead><tr><th>Page type</th><th>Result</th><th>Page checked · what we saw</th></tr></thead><tbody>" + rows + "</tbody></table></div>" + note + "</details>";
+}
+
+function progress() {
+  const list = ISSUES.filter(i => i.on.includes(current));
+  const n = list.filter(i => done[current + ":" + i.id]).length;
+  document.getElementById("progText").textContent = n + " of " + list.length + " shown for " + TEMPLATES[current].name;
+  document.getElementById("progBar").style.width = (list.length ? 100 * n / list.length : 0) + "%";
+}
+
+function copy(text, card) {
+  const msg = card?.querySelector(".toast");
+  const ok = () => { if (msg) { msg.textContent = "Copied"; setTimeout(() => msg.textContent = "", 1800); } };
+  const fallback = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) {} ta.remove(); };
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(ok, fallback); else fallback();
+}
+
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-copy]"); if (c) { copy(c.getAttribute("data-copy"), c.closest(".card")); return; }
+  const tk = e.target.closest("[data-ticket]");
+  if (tk) {
+    const iss = ISSUES.find(i => i.id === +tk.getAttribute("data-ticket")), t = current, u = urlFor(iss, t);
+    const steps = iss.steps(t).map((s, i) => (i + 1) + ". " + strip(s.t) + (s.find ? " \"" + s.find + "\"" : "")).join("\n");
+    copy([
+      "[" + (iss.p1 ? "High" : "Medium") + "] " + iss.title,
+      "Page type: " + TEMPLATES[t].name + " (" + TEMPLATES[t].note + ")",
+      "Example: " + u, "",
+      "Problem: " + iss.plain, "",
+      "How to see it:\n" + steps, "",
+      "Now: " + strip(iss.now), "Expected: " + strip(iss.should), "",
+      "Ask: " + iss.ask,
+      "",
+      "Technical detail:",
+      (document.getElementById("tech-" + iss.id) ? [...document.getElementById("tech-" + iss.id).content.querySelectorAll("dt")]
+        .map(dt => dt.textContent + ": " + dt.nextElementSibling.textContent.replace(/\n{3,}/g, "\n\n").trim()).join("\n\n") : ""),
+    ].join("\n"), tk.closest(".card"));
+  }
+});
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (TEMPLATES[h]) { current = h; render(); } });
+render();
+</script>
+
+</body>
+</html>
